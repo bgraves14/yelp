@@ -65,7 +65,7 @@ end
       expect(current_path).to eq '/restaurants'
     end
   end
-  context 'deleteing restaurants' do
+  context 'deleting restaurants' do
 
     before {Restaurant.create name: 'KFC'}
 
@@ -74,6 +74,17 @@ end
       click_link 'Delete KFC'
       expect(page).not_to have_content 'KFC'
       expect(page).to have_content 'Restaurant deleted successfully'
+    end
+
+    scenario 'removes all reviews of a restaurant when it is deleted' do
+      visit '/restaurants'
+      click_link 'Review KFC'
+      fill_in 'Thoughts', with: 'so so'
+      select '3', from: 'Rating'
+      click_button 'Leave Review'
+      expect(current_path).to eq restaurants_path
+      click_link 'Delete KFC'
+      expect(page).not_to have_content 'so so'
     end
   end
 end
