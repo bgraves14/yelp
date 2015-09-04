@@ -65,10 +65,9 @@ feature 'restaurants' do
     end
     context 'editing restaurants' do
 
-      before {Restaurant.create name: 'KFC'}
-
       scenario 'let a user edit a restaurant' do
         visit '/restaurants'
+        add_restaurant
         click_link 'Edit KFC'
         fill_in 'Name', with: 'Kentucky Fried Chicken'
         click_button 'Update Restaurant'
@@ -106,11 +105,21 @@ feature 'restaurants' do
         click_link 'Delete KFC'
         expect(page).to have_content 'You can only delete restaurants you have created'
       end
+
+      scenario 'can only edit a restaurant you have created' do
+        add_restaurant
+        click_link 'Sign out'
+        sign_up_user2
+        visit '/restaurants'
+        click_link 'Edit KFC'
+        expect(page).to have_content 'You can only edit restaurants you have created'
+      end
     end
   end
 
   context 'without logged in user' do
     context 'user must be logged to do these following actions' do
+
       scenario 'create a restaurant' do
         visit '/restaurants'
         click_link 'Add a restaurant'
@@ -118,19 +127,4 @@ feature 'restaurants' do
       end
     end
   end
-end
-
-def sign_up_user2
-  visit '/restaurants'
-  click_link 'Sign up'
-  fill_in 'Email', with: 'test2@test.com'
-  fill_in 'Password', with: '12345678'
-  fill_in 'Password confirmation', with: '12345678'
-  click_button 'Sign up'
-end
-
-def add_restaurant
-  click_link 'Add a restaurant'
-  fill_in 'Name', with: 'KFC'
-  click_button 'Create Restaurant'
 end
