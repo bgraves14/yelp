@@ -57,6 +57,7 @@ feature 'restaurants' do
 
       scenario 'lets a user view a restaurant' do
         visit '/restaurants'
+
         click_link 'KFC'
         expect(page).to have_content 'KFC'
         expect(current_path).to eq "/restaurants/#{kfc.id}"
@@ -77,10 +78,9 @@ feature 'restaurants' do
     end
     context 'deleting restaurants' do
 
-      before {Restaurant.create name: 'KFC'}
-
       scenario 'removes a restaurant when a user clicks a delete link' do
         visit '/restaurants'
+        add_restaurant
         click_link 'Delete KFC'
         expect(page).not_to have_content 'KFC'
         expect(page).to have_content 'Restaurant deleted successfully'
@@ -88,6 +88,7 @@ feature 'restaurants' do
 
       scenario 'removes all reviews of a restaurant when it is deleted' do
         visit '/restaurants'
+        add_restaurant
         click_link 'Review KFC'
         fill_in 'Thoughts', with: 'so so'
         select '3', from: 'Rating'
@@ -95,6 +96,15 @@ feature 'restaurants' do
         expect(current_path).to eq restaurants_path
         click_link 'Delete KFC'
         expect(page).not_to have_content 'so so'
+      end
+
+      scenario 'can only delete restaurants you have created' do
+        add_restaurant
+        click_link 'Sign out'
+        sign_up_user2
+        visit '/restaurants'
+        click_link 'Delete KFC'
+        expect(page).to have_content 'You can only delete restaurants you have created'
       end
     end
   end
@@ -108,4 +118,19 @@ feature 'restaurants' do
       end
     end
   end
+end
+
+def sign_up_user2
+  visit '/restaurants'
+  click_link 'Sign up'
+  fill_in 'Email', with: 'test2@test.com'
+  fill_in 'Password', with: '12345678'
+  fill_in 'Password confirmation', with: '12345678'
+  click_button 'Sign up'
+end
+
+def add_restaurant
+  click_link 'Add a restaurant'
+  fill_in 'Name', with: 'KFC'
+  click_button 'Create Restaurant'
 end
