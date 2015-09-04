@@ -19,7 +19,7 @@ feature 'reviewing' do
     click_link 'Review KFC'
     leave_review
     click_link 'Review KFC'
+    leave_review
     expect(page).to have_content 'You can only leave one review per restaurant'
   end
-
 end
